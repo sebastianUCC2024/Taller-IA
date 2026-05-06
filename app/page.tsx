@@ -14,14 +14,12 @@ export default function Home() {
         const el = document.getElementById(section);
         if (el) {
           const rect = el.getBoundingClientRect();
-          // Adjust offset to trigger slightly before the section hits the top
           if (rect.top <= 350) {
             current = section;
           }
         }
       }
       
-      // Reset if at the very top
       if (window.scrollY < 100) {
         current = "";
       }
@@ -30,7 +28,7 @@ export default function Home() {
     };
 
     window.addEventListener("scroll", handleScroll);
-    handleScroll(); // Initial check
+    handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -41,7 +39,7 @@ export default function Home() {
     } else {
       const el = document.getElementById(id);
       if (el) {
-        const yOffset = -100; // Account for fixed header
+        const yOffset = -100;
         const y = el.getBoundingClientRect().top + window.scrollY + yOffset;
         window.scrollTo({ top: y, behavior: "smooth" });
       }
@@ -49,9 +47,9 @@ export default function Home() {
   };
 
   return (
-    <>
-      <div className="grain-overlay"></div>
-      <div className="scanlines"></div>
+    <div className="flex flex-col min-h-screen relative">
+      <div className="grain-overlay pointer-events-none z-50"></div>
+      <div className="scanlines pointer-events-none z-50"></div>
 
       {/* BEGIN: MainHeader */}
       <header className="fixed top-0 left-0 w-full z-[100] bg-black/80 backdrop-blur-md border-b border-white/10 transition-all">
@@ -101,8 +99,8 @@ export default function Home() {
       {/* END: MainHeader */}
 
       {/* BEGIN: MainContent */}
-      {/* Increased bottom padding to prevent overlapping with footer */}
-      <main className="relative pt-32 pb-32 px-4 md:px-8 max-w-[1200px] mx-auto min-h-screen">
+      {/* Flex-grow ensures this area takes all remaining space, pushing the footer down naturally */}
+      <main className="flex-grow relative pt-32 pb-24 px-4 md:px-8 max-w-[1200px] w-full mx-auto">
         {/* Dense Collage Grid */}
         <div id="archive" className="grid grid-cols-12 gap-4 auto-rows-auto">
           {/* Top Left: Kaworu Section */}
@@ -275,52 +273,61 @@ export default function Home() {
             </div>
           </div>
         </div>
-
-        {/* Floating UI Decorations */}
-        <div className="fixed bottom-10 left-10 hidden lg:block z-50 pointer-events-none">
-          <div className="text-[8px] font-bold uppercase tracking-[0.5em] flex flex-col gap-2">
-            <div className="flex items-center gap-2"><span className="w-2 h-2 bg-red-600 animate-pulse"></span> EMERGENCY</div>
-            <div className="flex items-center gap-2"><span className="w-2 h-2 bg-white"></span> SYSTEM ONLINE</div>
-          </div>
-        </div>
-        <div className="fixed bottom-10 right-10 z-50 flex flex-col items-end gap-1">
-          <div className="text-[10px] brutalist-font font-bold uppercase tracking-widest text-white/50 mb-2 drop-shadow-md">Navigation Control</div>
-          <div className="flex gap-2">
-            <button 
-              onClick={(e) => scrollTo(e, "top")} 
-              className="w-10 h-10 border border-white/20 flex items-center justify-center bg-black/50 backdrop-blur-sm hover:bg-white hover:text-black transition-colors shadow-lg"
-            >
-              ↑
-            </button>
-            <button 
-              onClick={(e) => scrollTo(e, "manifesto")}
-              className="w-10 h-10 border border-white/20 flex items-center justify-center bg-black/50 backdrop-blur-sm hover:bg-white hover:text-black transition-colors shadow-lg"
-            >
-              ↓
-            </button>
-          </div>
-        </div>
       </main>
       {/* END: MainContent */}
 
       {/* BEGIN: Footer */}
-      {/* Added top margin and ensured block display to prevent grid overlapping */}
-      <footer className="border-t border-white/10 py-16 px-6 bg-black relative overflow-hidden mt-16 w-full block clear-both z-50">
-        <img alt="Footer Texture" className="absolute inset-0 w-full h-full object-cover opacity-5" src="https://cdn.myanimelist.net/images/anime/12/23255l.jpg" />
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8 relative z-10">
-          <div className="text-center md:text-left">
-            <p className="text-[10px] uppercase tracking-[0.4em] font-bold mb-2">Project Evangelion Digital Archive</p>
-            <p className="text-[8px] text-gray-500 uppercase">Unauthorized access to NERV mainframes is strictly prohibited. © 2024</p>
+      <footer className="mt-auto border-t border-white/10 py-12 px-6 md:px-10 bg-black relative overflow-hidden w-full z-10">
+        <img alt="Footer Texture" className="absolute inset-0 w-full h-full object-cover opacity-5 pointer-events-none" src="https://cdn.myanimelist.net/images/anime/12/23255l.jpg" />
+        
+        <div className="max-w-7xl mx-auto flex flex-col lg:flex-row justify-between items-center gap-8 relative z-10">
+          
+          {/* Left: Status Indicators */}
+          <div className="flex flex-col gap-3 text-[8px] md:text-[10px] font-bold uppercase tracking-[0.5em] w-full lg:w-1/3 text-left">
+            <div className="flex items-center gap-3"><span className="w-2 h-2 bg-red-600 animate-pulse"></span> EMERGENCIA</div>
+            <div className="flex items-center gap-3"><span className="w-2 h-2 bg-white"></span> SISTEMA EN LÍNEA</div>
           </div>
-          <div className="flex gap-8 text-[10px] font-black uppercase brutalist-font">
-            <a className="hover:line-through hover:text-red-500 transition-colors" href="#">Legal</a>
-            <a className="hover:line-through hover:text-red-500 transition-colors" href="#">Contact</a>
-            <a className="hover:line-through hover:text-red-500 transition-colors" href="#">Twitter</a>
-            <a className="hover:line-through hover:text-red-500 transition-colors" href="#">GitHub</a>
+
+          {/* Center: Primary Branding (Grey disclaimer removed) */}
+          <div className="text-center w-full lg:w-1/3">
+            <h2 className="text-sm md:text-base uppercase tracking-[0.4em] font-black brutalist-font text-white">
+              Project Evangelion
+            </h2>
           </div>
+
+          {/* Right: Navigation Controls & Links */}
+          <div className="flex flex-col items-end gap-6 w-full lg:w-1/3">
+            <div className="flex gap-4 items-center">
+              <span className="text-[8px] md:text-[10px] brutalist-font font-bold uppercase tracking-widest text-white/50">
+                Control de Navegación
+              </span>
+              <div className="flex gap-2">
+                <button 
+                  onClick={(e) => scrollTo(e as any, "top")} 
+                  className="w-10 h-10 border border-white/20 flex items-center justify-center bg-black/80 hover:bg-white hover:text-black transition-colors"
+                >
+                  ↑
+                </button>
+                <button 
+                  onClick={(e) => scrollTo(e as any, "manifesto")}
+                  className="w-10 h-10 border border-white/20 flex items-center justify-center bg-black/80 hover:bg-white hover:text-black transition-colors"
+                >
+                  ↓
+                </button>
+              </div>
+            </div>
+            
+            <div className="flex flex-wrap justify-end gap-6 text-[10px] font-black uppercase brutalist-font">
+              <a className="hover:text-red-500 transition-colors" href="#">Legal</a>
+              <a className="hover:text-red-500 transition-colors" href="#">Contacto</a>
+              <a className="hover:text-red-500 transition-colors" href="#">Twitter</a>
+              <a className="hover:text-red-500 transition-colors" href="#">GitHub</a>
+            </div>
+          </div>
+
         </div>
       </footer>
       {/* END: Footer */}
-    </>
+    </div>
   );
 }
