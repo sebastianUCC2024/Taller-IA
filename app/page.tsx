@@ -1,24 +1,98 @@
+"use client";
+
+import { useEffect, useState } from "react";
+
 export default function Home() {
+  const [activeSection, setActiveSection] = useState("");
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const sections = ["archive", "unit-01", "personnel", "manifesto"];
+      let current = "";
+      
+      for (const section of sections) {
+        const el = document.getElementById(section);
+        if (el) {
+          const rect = el.getBoundingClientRect();
+          // Adjust offset to trigger slightly before the section hits the top
+          if (rect.top <= 350) {
+            current = section;
+          }
+        }
+      }
+      
+      // Reset if at the very top
+      if (window.scrollY < 100) {
+        current = "";
+      }
+      
+      setActiveSection(current);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    handleScroll(); // Initial check
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const scrollTo = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+    e.preventDefault();
+    if (id === "top") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } else {
+      const el = document.getElementById(id);
+      if (el) {
+        const yOffset = -100; // Account for fixed header
+        const y = el.getBoundingClientRect().top + window.scrollY + yOffset;
+        window.scrollTo({ top: y, behavior: "smooth" });
+      }
+    }
+  };
+
   return (
     <>
       <div className="grain-overlay"></div>
       <div className="scanlines"></div>
 
       {/* BEGIN: MainHeader */}
-      <header className="fixed top-0 left-0 w-full z-[100] bg-black/80 backdrop-blur-md border-b border-white/10">
+      <header className="fixed top-0 left-0 w-full z-[100] bg-black/80 backdrop-blur-md border-b border-white/10 transition-all">
         <nav className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
           <div className="flex items-center gap-8">
-            <a className="text-xl font-black tracking-tighter uppercase brutalist-font" href="#">EVANGELION</a>
+            <a 
+              onClick={(e) => scrollTo(e, "top")} 
+              className="text-xl font-black tracking-tighter uppercase brutalist-font cursor-pointer hover:text-red-500 transition-colors"
+            >
+              EVANGELION
+            </a>
             <div className="hidden md:flex gap-6 text-[10px] uppercase tracking-widest text-gray-400">
-              <a className="hover:text-white transition-colors" href="#">Archive</a>
-              <a className="hover:text-white transition-colors" href="#">Personnel</a>
-              <a className="hover:text-white transition-colors" href="#">Unit-01</a>
-              <a className="hover:text-white transition-colors" href="#">Manifesto</a>
+              <a 
+                onClick={(e) => scrollTo(e, "archive")}
+                className={`cursor-pointer transition-colors pb-1 border-b-2 ${activeSection === 'archive' ? 'text-white border-red-600' : 'border-transparent hover:text-white'}`}
+              >
+                Archivo
+              </a>
+              <a 
+                onClick={(e) => scrollTo(e, "personnel")}
+                className={`cursor-pointer transition-colors pb-1 border-b-2 ${activeSection === 'personnel' ? 'text-white border-red-600' : 'border-transparent hover:text-white'}`}
+              >
+                Personal
+              </a>
+              <a 
+                onClick={(e) => scrollTo(e, "unit-01")}
+                className={`cursor-pointer transition-colors pb-1 border-b-2 ${activeSection === 'unit-01' ? 'text-white border-red-600' : 'border-transparent hover:text-white'}`}
+              >
+                Unidad-01
+              </a>
+              <a 
+                onClick={(e) => scrollTo(e, "manifesto")}
+                className={`cursor-pointer transition-colors pb-1 border-b-2 ${activeSection === 'manifesto' ? 'text-white border-red-600' : 'border-transparent hover:text-white'}`}
+              >
+                Manifesto
+              </a>
             </div>
           </div>
           <div className="flex items-center gap-4">
             <span className="text-[10px] text-gray-500 uppercase tracking-widest hidden sm:inline">Project-E 2024</span>
-            <button className="bg-white text-black px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest hover:invert transition-all">
+            <button className="bg-white text-black px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest hover:bg-red-600 hover:text-white transition-all shadow-[0_0_10px_rgba(255,255,255,0.2)]">
               Initiate
             </button>
           </div>
@@ -27,9 +101,10 @@ export default function Home() {
       {/* END: MainHeader */}
 
       {/* BEGIN: MainContent */}
-      <main className="relative pt-24 pb-20 px-4 md:px-8 max-w-[1200px] mx-auto min-h-screen">
+      {/* Increased bottom padding to prevent overlapping with footer */}
+      <main className="relative pt-32 pb-32 px-4 md:px-8 max-w-[1200px] mx-auto min-h-screen">
         {/* Dense Collage Grid */}
-        <div className="grid grid-cols-12 gap-2 md:gap-4 auto-rows-min">
+        <div id="archive" className="grid grid-cols-12 gap-4 auto-rows-auto">
           {/* Top Left: Kaworu Section */}
           <div className="col-span-12 md:col-span-4 collage-card bg-black border border-white/20 p-4 flex flex-col gap-4">
             <div className="flex justify-between items-start">
@@ -114,7 +189,7 @@ export default function Home() {
           </div>
 
           {/* Right Middle: Unit-01 Profile */}
-          <div className="col-span-12 md:col-span-4 collage-card border border-white/20 p-4 bg-black relative">
+          <div id="unit-01" className="col-span-12 md:col-span-4 collage-card border border-white/20 p-4 bg-black relative scroll-mt-32">
             <div className="aspect-[3/5] relative bg-neutral-900 border border-white/10 group overflow-hidden">
               <img alt="Unit-01" className="w-full h-full object-cover grayscale brightness-75 group-hover:grayscale-0 group-hover:scale-105 transition-all duration-[1.5s]" src="https://cdn.myanimelist.net/images/anime/12/21418l.jpg" />
               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
@@ -127,7 +202,7 @@ export default function Home() {
           </div>
 
           {/* Bottom Personnel Section */}
-          <div className="col-span-12 md:col-span-4 flex flex-col gap-4">
+          <div id="personnel" className="col-span-12 md:col-span-4 flex flex-col gap-4 scroll-mt-32">
             <div className="collage-card bg-neutral-950 border border-white/20 p-4 relative overflow-hidden group">
               <img alt="Tech Texture" className="absolute inset-0 w-full h-full object-cover opacity-10 mix-blend-overlay group-hover:opacity-20 transition-opacity" src="https://cdn.myanimelist.net/images/anime/3/9715l.jpg" />
               <div className="relative z-10">
@@ -185,7 +260,7 @@ export default function Home() {
           </div>
 
           {/* Final Footer Block */}
-          <div className="col-span-12 md:col-span-3 collage-card bg-white text-black p-6 flex flex-col justify-between min-h-[300px] relative overflow-hidden group">
+          <div id="manifesto" className="col-span-12 md:col-span-3 collage-card bg-white text-black p-6 flex flex-col justify-between min-h-[300px] relative overflow-hidden group scroll-mt-32">
             <img alt="Third Impact" className="absolute inset-0 w-full h-full object-cover opacity-[0.08] grayscale group-hover:opacity-20 transition-opacity duration-700" src="https://cdn.myanimelist.net/images/anime/12/21419l.jpg" />
             <div className="relative z-10">
               <h6 className="text-sm font-black brutalist-font uppercase tracking-tighter">Neon Genesis<br />Evangelion</h6>
@@ -193,7 +268,7 @@ export default function Home() {
               <p className="text-[9px] font-bold uppercase leading-tight bg-white/80 p-1">Humanity faces the ultimate trial. The third impact is imminent. Are you prepared to lose your physical form?</p>
             </div>
             <div className="space-y-4 relative z-10">
-              <div className="text-3xl font-black brutalist-font text-red-600 group-hover:tracking-widest transition-all duration-500">FINALE:</div>
+              <div className="text-3xl font-black brutalist-font text-red-600 group-hover:tracking-widest transition-all duration-500">MANIFESTO</div>
               <button className="w-full bg-black text-white py-3 text-xs font-bold uppercase tracking-widest hover:bg-red-600 hover:text-white transition-all shadow-lg border border-transparent hover:border-black">
                 Initiate Contact
               </button>
@@ -211,15 +286,26 @@ export default function Home() {
         <div className="fixed bottom-10 right-10 z-50 flex flex-col items-end gap-1">
           <div className="text-[10px] brutalist-font font-bold uppercase tracking-widest text-white/50 mb-2 drop-shadow-md">Navigation Control</div>
           <div className="flex gap-2">
-            <button className="w-10 h-10 border border-white/20 flex items-center justify-center bg-black/50 backdrop-blur-sm hover:bg-white hover:text-black transition-colors shadow-lg">↑</button>
-            <button className="w-10 h-10 border border-white/20 flex items-center justify-center bg-black/50 backdrop-blur-sm hover:bg-white hover:text-black transition-colors shadow-lg">↓</button>
+            <button 
+              onClick={(e) => scrollTo(e, "top")} 
+              className="w-10 h-10 border border-white/20 flex items-center justify-center bg-black/50 backdrop-blur-sm hover:bg-white hover:text-black transition-colors shadow-lg"
+            >
+              ↑
+            </button>
+            <button 
+              onClick={(e) => scrollTo(e, "manifesto")}
+              className="w-10 h-10 border border-white/20 flex items-center justify-center bg-black/50 backdrop-blur-sm hover:bg-white hover:text-black transition-colors shadow-lg"
+            >
+              ↓
+            </button>
           </div>
         </div>
       </main>
       {/* END: MainContent */}
 
       {/* BEGIN: Footer */}
-      <footer className="border-t border-white/10 py-12 px-6 bg-black relative overflow-hidden">
+      {/* Added top margin and ensured block display to prevent grid overlapping */}
+      <footer className="border-t border-white/10 py-16 px-6 bg-black relative overflow-hidden mt-16 w-full block clear-both z-50">
         <img alt="Footer Texture" className="absolute inset-0 w-full h-full object-cover opacity-5" src="https://cdn.myanimelist.net/images/anime/12/23255l.jpg" />
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8 relative z-10">
           <div className="text-center md:text-left">
